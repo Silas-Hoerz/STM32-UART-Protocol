@@ -1,0 +1,38 @@
+# Build-Artefakte
+#############################
+*.elf
+*.hex
+*.bin
+*.map
+*.o
+*.d
+*.suo
+*.sln
+_build/
+Debug/
+Release/
+
+# STM32CubeIDE-spezifische Dateien
+#############################
+.metadata/
+.mxproject
+.cproject
+.project
+.settings/
+*.launch
+*.log
+
+# C/C++-spezifische Dateien
+#############################
+*.dep
+*.bak
+*.srec
+*.sym
+*.lst
+*.map
+*.a
+
+# Sonstige Dateien
+#############################
+.vscode/
+.DS_Store
