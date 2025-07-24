@@ -34,7 +34,6 @@ The framework is divided into two distinct layers to ensure maximum portability 
 - **Protocol Layer (`protocol.c` / `protocol.h`)**  
   Implements the actual logic, roles (Master/Slave), and state machine behavior. Accesses only the UART public API.
 
----
 
 ### Non-Invasive Debugging
 
@@ -65,7 +64,6 @@ The RX design enables robust reception of arbitrary-length packets using minimal
 
 **Result:** All packets received efficiently and safely, regardless of length or timing.
 
----
 
 ### UART Transmission (TX) with DMA
 
@@ -102,13 +100,11 @@ A resilient state machine architecture actively manages the connection.
 
 Ensures fast recovery and desync prevention.
 
----
 
 ### Master State Machine
 
 [![Master State Machine](./assets/master_protocol_en_dark.png)](./assets/master_protocol_en_dark.png)
 
----
 
 ### Slave State Machine
 
@@ -128,7 +124,6 @@ Ensures fast recovery and desync prevention.
 // #define MY_DEVICE_ROLE PROTOCOL_ROLE_SLAVE
 ```
 
----
 
 ### 2. Initialize the UART Handle
 
@@ -160,7 +155,6 @@ int main(void) {
 }
 ```
 
----
 
 ### 3. Monitor Communication Status
 
@@ -184,7 +178,6 @@ Adding new commands is **easy and clean**:
 #define PROTOCOL_CMD_SEND_STATS    0x11
 ```
 
----
 
 ### Step 2: Implement Handler in `protocol.c`
 
@@ -201,7 +194,6 @@ static void Protocol_HandleRequestStats(uint8_t sender_role, uint8_t *data, uint
 }
 ```
 
----
 
 ### Step 3: Register in `protocol_command_table`
 
@@ -235,5 +227,3 @@ No changes needed in the core FSM — fully modular design.
 
 This project was inspired by **Tilen Majerle**’s excellent [stm32-usart-uart-dma-rx-tx](https://github.com/MaJerle/stm32-usart-uart-dma-rx-tx) repository.  
 His work provided a solid foundation for DMA-based UART communication on STM32 microcontrollers.
-
----
