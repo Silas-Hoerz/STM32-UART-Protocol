@@ -6,6 +6,23 @@
  * @brief Implements the universal, DMA-based UART driver library.
  */
 
+/**
+ * All communication uses a fixed frame format to ensure reliable data transfer.
+ * The structure is designed for integrity with a clear start/stop, header,
+ * payload, and a robust CRC32 checksum.
+ *
+ * Framed packet structure:
+ * `[START] [ROLE] [CMD] [LEN_L] [LEN_H] [DATA...] [CRC32] [STOP]`
+ *
+ * - **Start Byte (1 Byte):** `0x55`. Marks the beginning of a packet.
+ * - **Sender Role (1 Byte):** Defines the sender (e.g., `0x01` Master, `0x02` Slave).
+ * - **Command ID (1 Byte):** Identifies the message type.
+ * - **Length (2 Bytes):** The 16-bit payload length, transmitted as Little Endian (`LENGTH_L` then `LENGTH_H`).
+ * - **Data Payload (0-PKT_MAX_LEN Bytes):** The message content.
+ * - **CRC32 Checksum (4 Bytes):** A 32-bit CRC. It's calculated over the `Sender Role`, `Command ID`, `Length` (2 Bytes) and the entire `Data Payload`. Transmitted LSB first.
+ * - **Stop Byte (1 Byte):** `0xAA`. Marks the end of a packet.
+ */
+
 #include "uart.h"
 #include <string.h> // For memcpy, strlen
 
@@ -143,6 +160,8 @@ void UART_RxCheck(UART_Handle_t* huart) {
         old_pos = pos;
     }
 }
+
+
 
 static void UART_ProcessData(UART_Handle_t* huart, const void *data, size_t len) {
     const uint8_t *d = data;

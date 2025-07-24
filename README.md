@@ -74,6 +74,23 @@ The RX design enables robust reception of arbitrary-length packets using minimal
 
 **CPU Load:** Near-zero during TX — ideal for real-time systems.
 
+
+### Packet Structure
+
+All packets sent and received via UART follow a fixed structure to ensure reliable data transmission. This structure provides clear packet delimitation and robust error detection using a CRC32 checksum.
+
+**Packet Format:** `[START] [ROLE] [CMD] [LEN_L] [LEN_H] [DATA...] [CRC32] [STOP]`
+
+| Field | Size | Description |
+| :--- | :--- | :--- |
+| **Start Byte** | 1 Byte | Always `0x55`. Signals the beginning of a packet. |
+| **Sender Role** | 1 Byte | Defines the role of the sending device (e.g., `0x01` for Master, `0x02` for Slave). |
+| **Command ID** | 1 Byte | Identifies the command or message type (e.g., PING, PONG). |
+| **Length** | 2 Bytes | The 16-bit length of the following data payload (Little Endian). |
+| **Data Payload** | 0-N Bytes | The actual content of the message. |
+| **CRC32 Checksum** | 4 Bytes | A 32-bit checksum calculated over the `Sender Role`, `Command ID`, `Length`, and the entire `Data Payload`. |
+| **Stop Byte** | 1 Byte | Always `0xAA`. Signals the end of a packet. |
+
 ---
 
 ## 💥 Fault Tolerance & Auto-Recovery
