@@ -24,7 +24,7 @@ The primary goal is to deliver a reliable, fault-tolerant communication system t
 
 ## ⚙️ Core Features & Philosophy
 
-### 🧱 Modular Architecture
+### Modular Architecture
 
 The framework is divided into two distinct layers to ensure maximum portability and maintainability:
 
@@ -36,9 +36,9 @@ The framework is divided into two distinct layers to ensure maximum portability 
 
 ---
 
-### 🐞 Non-Invasive Debugging
+### Non-Invasive Debugging
 
-ℹ️ **Info**: Instead of `printf` debugging (which would interfere with UART), the system exposes internal status variables for inspection via a debugger.
+**Info**: Instead of `printf` debugging (which would interfere with UART), the system exposes internal status variables for inspection via a debugger.
 
 Useful globals:
 
@@ -50,7 +50,7 @@ Useful globals:
 
 ## 🛠️ Background: The Hardware Layer in Practice
 
-### 📥 UART Reception (RX) with DMA Circular Mode
+### UART Reception (RX) with DMA Circular Mode
 
 The RX design enables robust reception of arbitrary-length packets using minimal CPU time.
 
@@ -63,54 +63,54 @@ The RX design enables robust reception of arbitrary-length packets using minimal
 3. **DMA HT/TC Events**  
    Ensures the system catches data even when the IDLE line isn't triggered. Interrupts on half or full buffer events.
 
-✅ **Result:** All packets received efficiently and safely, regardless of length or timing.
+**Result:** All packets received efficiently and safely, regardless of length or timing.
 
 ---
 
-### 📤 UART Transmission (TX) with DMA
+### UART Transmission (TX) with DMA
 
 1. Protocol layer calls `UART_SendPacketDMA(...)`
 2. UART layer assembles complete packet (header + payload + CRC)
 3. DMA sends buffer to UART TX register autonomously
 4. `TC` (Transfer Complete) interrupt signals finished transmission
 
-⚡ **CPU Load:** Near-zero during TX — ideal for real-time systems.
+**CPU Load:** Near-zero during TX — ideal for real-time systems.
 
 ---
 
-## 🔌 Fault Tolerance & Auto-Recovery
+## 💥 Fault Tolerance & Auto-Recovery
 
 A resilient state machine architecture actively manages the connection.
 
-### 🔄 State-Driven Design
+### State-Driven Design
 
 - Examples: `FINDING_SLAVE`, `CONNECTED_MASTER`, `DISCONNECTED`
 - Logic separated via `Protocol_MasterLogic()` / `Protocol_SlaveLogic()`
 
-### ⏱️ Event-Driven Timeouts
+### Event-Driven Timeouts
 
-⚠️ **Warning**: Timeouts are based on **hardware events**, not just software counters.
+**Warning**: Timeouts are based on **hardware events**, not just software counters.
 
 - If Master misses `PONG` → timeout → `RECONNECTING`
 - If Slave misses `PING` → timeout → disconnect
 - Timeouts reset only on verified incoming packets (e.g. via IDLE interrupt)
 
-### 💥 Hardware Error Response
+### Hardware Error Response
 
 - Errors like **Overrun** (`UART_ERR_OVERRUN`) are caught in the IRQ handler.
 - Immediate protocol reset triggered via `PROTOCOL_OnErrorOccurred()`
 
-✅ Ensures fast recovery and desync prevention.
+Ensures fast recovery and desync prevention.
 
 ---
 
-### 🧭 Master State Machine
+### Master State Machine
 
 [![Master State Machine](./assets/master_protocol_en_dark.png)](./assets/master_protocol_en_dark.png)
 
 ---
 
-### 🛰️ Slave State Machine
+### Slave State Machine
 
 [![Slave State Machine](./assets/slave_protocol_en_dark.png)](./assets/slave_protocol_en_dark.png)
 
@@ -118,7 +118,7 @@ A resilient state machine architecture actively manages the connection.
 
 ## 🚀 Getting Started: Integration Guide
 
-### 1️⃣ Include Headers and Define Role
+### 1. Include Headers and Define Role
 
 ```c
 #include "protocol.h"
@@ -130,7 +130,7 @@ A resilient state machine architecture actively manages the connection.
 
 ---
 
-### 2️⃣ Initialize the UART Handle
+### 2. Initialize the UART Handle
 
 > ⚠️ **Important:** Do **not** use `MX_USARTx_UART_Init()` from CubeMX.  
 > The UART is fully initialized by this library.
@@ -162,7 +162,7 @@ int main(void) {
 
 ---
 
-### 3️⃣ Monitor Communication Status
+### 3. Monitor Communication Status
 
 You can inspect the following globals in the debugger or logging system:
 
@@ -177,7 +177,7 @@ You can inspect the following globals in the debugger or logging system:
 
 Adding new commands is **easy and clean**:
 
-### 📌 Step 1: Define Command in `protocol.h`
+### Step 1: Define Command in `protocol.h`
 
 ```c
 #define PROTOCOL_CMD_REQUEST_STATS 0x10
@@ -186,7 +186,7 @@ Adding new commands is **easy and clean**:
 
 ---
 
-### 🧠 Step 2: Implement Handler in `protocol.c`
+### Step 2: Implement Handler in `protocol.c`
 
 ```c
 static void Protocol_HandleRequestStats(uint8_t sender_role, uint8_t *data, uint16_t len) {
@@ -203,7 +203,7 @@ static void Protocol_HandleRequestStats(uint8_t sender_role, uint8_t *data, uint
 
 ---
 
-### 🔗 Step 3: Register in `protocol_command_table`
+### Step 3: Register in `protocol_command_table`
 
 ```c
 static const Protocol_Cmd_t protocol_command_table[] = {
@@ -213,7 +213,7 @@ static const Protocol_Cmd_t protocol_command_table[] = {
 };
 ```
 
-✅ No changes needed in the core FSM — fully modular design.
+No changes needed in the core FSM — fully modular design.
 
 ---
 
